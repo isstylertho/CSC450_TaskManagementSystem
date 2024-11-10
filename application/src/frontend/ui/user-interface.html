@@ -4,6 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="TaskManagementSystem.css">
+    <script>
+        function handleButtonClick() {
+            // this may need updated since it works with flask
+            fetch('/switch_layout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({action: 'clicked'})
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("message").innerText = data.message;  // Update the message on the page
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
 </head>
 <body>
     <section class="left-side-navigation">
@@ -11,6 +28,8 @@
             <a href="UserProfile"><img src="UserProfile.svg" alt="UserProfile" style="width:30px;height:30px;"></a>
             <a href="Notifications"><img src="NotificationsWhite.svg" alt="Notifications" style="width:30px;height:30px;"></a>
             <a href="Settings"><img src="Settings.svg" alt="Settings" style="width:30px;height:30px;"></a>
+            <!--calls script function when button is clicked-->
+            <button type="submit" onclick="switch_layout()"><img src="CalendarIcon.svg" alt="CalendarToggle" style="width:30px;height:30px;"></button>
         </header>
         <nav>
             <ul>
