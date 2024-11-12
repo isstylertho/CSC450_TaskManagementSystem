@@ -18,4 +18,4 @@ def switch_layout():
             current_layout = 'list_view' #reset layout to default view
         display_layout(current_layout)
     else:
-        continue #button not clicked, do nothing
+        pass #button not clicked, do nothing
