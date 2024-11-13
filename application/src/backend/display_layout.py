@@ -1,3 +1,5 @@
+#MOVED THIS INTO CSC 450 CODE.PY
+
 #this defines the layout to display list view by default
 current_layout = 'list_view'
 
