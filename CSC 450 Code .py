@@ -140,7 +140,7 @@ def switch_layout():
         elif current_layout == 'calendar_view':
             current_layout = 'list_view'
         else:
-            print('Error occurred - unable to switch layout. Try again.') #if current layout is somehow not set to list_view
+            #if current layout is somehow not set to list_view
             current_layout = 'list_view' #reset layout to default view
         display_layout(current_layout)
     else:
