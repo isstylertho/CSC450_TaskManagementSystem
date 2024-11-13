@@ -142,6 +142,6 @@ def switch_layout():
         else:
             #if current layout is somehow not set to list_view
             current_layout = 'list_view' #reset layout to default view
-        display_layout(current_layout)
+        display_layout()
     else:
         pass #button not clicked, do nothing
