@@ -1,3 +1,5 @@
+#MOVED THIS INTO CSC 450 CODE.PY
+
 #import in order to call display function
 from display_layout import display_layout
 #import this in order to modify variable used in display function
