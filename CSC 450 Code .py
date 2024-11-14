@@ -18,7 +18,7 @@ def add_tasks():
     for i, task in enumerate(sample_tasks, start=1):
         print(f"{i}. {task}")
 
-    user_selection = input("Enter the number of the tasks you would like to add, separated by commas: ")
+    user_selection = input("Enter the name of tasks you would like to add, separated by commas: ")
     tasks = user_selection.split(",")
     tasks_to_add = [
         sample_tasks[int(task) - 1]
@@ -113,35 +113,3 @@ def start_func():
 
 # Start the program
 start_func()
-
-#this defines the layout to display list view by default
-current_layout = 'list_view'
-
-#this function checks the active layout and displays it
-def display_layout():
-    global current_layout
-    if current_layout == 'list_view':
-        #displays list view layout
-        return render_template('task-overview-view.html')
-    elif current_layout == 'calendar_view':
-        #displays calendar view layout
-        return render_template('calendar_view.html')
-    else:
-        print('There was an issue displaying the layout. Try again.')
-
-#this function switches layout on user input and calls display function
-@app.route('/switch_layout', methods=['POST'])
-def switch_layout():
-    data = request.get_json() #info of whether the button was clicked or not by user
-    if data.get('action') == 'clicked':
-        global current_layout
-        if current_layout == 'list_view':
-            current_layout = 'calendar_view'
-        elif current_layout == 'calendar_view':
-            current_layout = 'list_view'
-        else:
-            #if current layout is somehow not set to list_view
-            current_layout = 'list_view' #reset layout to default view
-        display_layout()
-    else:
-        pass #button not clicked, do nothing
