@@ -4,24 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="user-interface.css">
-    <!--The following script takes the user input from the calendar toggle button and updates the switch function-->
-    <script>
-        function handleButtonClick() {
-            // this may need updated since it works with flask
-            fetch('/CSC 450 Code .py', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({action: 'clicked'})
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("message").innerText = data.message;  // Update the message on the page
-            })
-            .catch(error => console.error('Error:', error));
-        }
-    </script>
 </head>
 <body>
     <section class="left-side-navigation">
@@ -29,11 +11,10 @@
             <a href="UserProfile"><img src="https://raw.githubusercontent.com/isstylertho/CSC450_TaskManagementSystem/refs/heads/main/application/src/frontend/ui/resources/UserProfile.svg" alt="UserProfile" style="width:30px;height:30px;"></a>
             <a href="Notifications"><img src="https://raw.githubusercontent.com/isstylertho/CSC450_TaskManagementSystem/refs/heads/main/application/src/frontend/ui/resources/NotificationsWhite.svg" alt="Notifications" style="width:30px;height:30px;"></a>
             <a href="Settings"><img src="https://raw.githubusercontent.com/isstylertho/CSC450_TaskManagementSystem/refs/heads/main/application/src/frontend/ui/resources/Settings.svg" alt="Settings" style="width:30px;height:30px;"></a>
-            <!--Calendar toggle button the calls script function when button is clicked-->
-            <button type="submit" onclick="handleButtonClick()">View Lists<!--<img src="CalendarIcon.svg" alt="CalendarToggle" style="width:30px;height:30px;">--></button>
         </header>
         <nav>
             <ul>
+                <li><a href="calendar-view.html"><img src="https://raw.githubusercontent.com/isstylertho/CSC450_TaskManagementSystem/refs/heads/main/application/src/frontend/ui/resources/CalendarIcon.svg" alt="CalendarToggle" style="width:30px;height:30px;">Calendar</a></li>
                 <li><a href="today-view.html"><img src="https://raw.githubusercontent.com/isstylertho/CSC450_TaskManagementSystem/refs/heads/main/application/src/frontend/ui/resources/Today.svg" alt="UserProfile" style="width:20px;height:20px;">Today</a></li>
                 <li><a href="task-overview-view.html"><img src="https://raw.githubusercontent.com/isstylertho/CSC450_TaskManagementSystem/refs/heads/main/application/src/frontend/ui/resources/Today.svg" alt="UserProfile" style="width:20px;height:20px;">Task Overview</a></li>
                 <li><a href="task-completed-view.html"><img src="https://raw.githubusercontent.com/isstylertho/CSC450_TaskManagementSystem/refs/heads/main/application/src/frontend/ui/resources/Completed.svg" alt="UserProfile" style="width:20px;height:20px;">Completed</a></li>
