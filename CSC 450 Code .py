@@ -1,3 +1,7 @@
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
 sample_tasks = ["Fold Laundry", "Study for Midterm", "Wash Dishes", "Walk Dog"]
 user_lists = []
 
