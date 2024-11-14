@@ -121,11 +121,11 @@ current_layout = 'list_view'
 def display_layout():
     global current_layout
     if current_layout == 'list_view':
-        #insert command to display list view layout (may need connected to Flask)
-        print('list_view is being displayed')
+        #displays list view layout
+        return render_template('task-overview-view.html')
     elif current_layout == 'calendar_view':
-        #insert command to display calendar view layout (may need connected to Flask)
-        print('calendar_view is being displayed')
+        #displays calendar view layout
+        return render_template('calendar_view.html')
     else:
         print('There was an issue displaying the layout. Try again.')
 
