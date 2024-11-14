@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     fetchTasks();
+
+    document.getElementById("addTaskButton").addEventListener("click", addTask);
 });
 
 function fetchTasks() {
