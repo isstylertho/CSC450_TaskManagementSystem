@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="user-interface.css">
+    <script src="script.service.js" defer></script>
 </head>
 <body>
     <section class="left-side-navigation">
@@ -14,7 +15,6 @@
         </header>
         <nav>
             <ul>
-                <li><a href="calendar-view.html"><img src="https://raw.githubusercontent.com/isstylertho/CSC450_TaskManagementSystem/refs/heads/main/application/src/frontend/ui/resources/CalendarIcon.svg" alt="UserProfile" style="width:20px;height:20px;">Calendar</a></li>
                 <li><a href="today-view.html"><img src="https://raw.githubusercontent.com/isstylertho/CSC450_TaskManagementSystem/refs/heads/main/application/src/frontend/ui/resources/Today.svg" alt="UserProfile" style="width:20px;height:20px;">Today</a></li>
                 <li><a href="task-overview-view.html"><img src="https://raw.githubusercontent.com/isstylertho/CSC450_TaskManagementSystem/refs/heads/main/application/src/frontend/ui/resources/Today.svg" alt="UserProfile" style="width:20px;height:20px;">Task Overview</a></li>
                 <li><a href="task-completed-view.html"><img src="https://raw.githubusercontent.com/isstylertho/CSC450_TaskManagementSystem/refs/heads/main/application/src/frontend/ui/resources/Completed.svg" alt="UserProfile" style="width:20px;height:20px;">Completed</a></li>
@@ -24,7 +24,9 @@
     <section class="right-side-main-content">
         <main>
             <h1>Today</h1>
-
+            <input type="text" id="taskInput" placeholder="Add a new task">
+            <button id="addTaskButton">Add Task</button>
+            <ul id="taskList"></ul>
         </main>
     </section>
 </body>
