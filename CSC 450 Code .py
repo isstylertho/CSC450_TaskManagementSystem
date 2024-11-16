@@ -115,5 +115,28 @@ def start_func():
         else:
             print("Invalid selection. Please try again.")
 
-# Start the program
-start_func()
+    # Start the program
+    start_func()
+
+@app.route("", methods= ['GET', 'POST']) #connects with html user input; need to add directory
+def login():
+    if request.method == 'GET':
+        return ""
+    elif request.method == 'POST':
+        #ensure these are the same input names on frontend
+        username = request.form ['username'] 
+        password = request.form ['password']
+
+        cursor = mydb.cursor()
+        cursor.execute("SELECT username, id FROM users WHERE username=? and password=?", (username, password)) #SQL injection prevention: entering ' or 1=1
+        if cursor.rowcount == 1;
+            user = cursor.fetchone()
+            return "Login sucessful"
+        else:
+            return "The password or username you have entered is incorrect - Try again."
+    else:
+        return "Error: Request method neither POST nor GET"
+
+
+
+    
