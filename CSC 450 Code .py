@@ -128,7 +128,8 @@ def login():
         password = request.form ['password']
 
         cursor = mydb.cursor()
-        cursor.execute("SELECT username, id FROM users WHERE username=? and password=?", (username, password)) #SQL injection prevention: entering ' or 1=1
+        #SQL injection prevention: entering ' or 1=1
+        cursor.execute("SELECT username, id FROM users WHERE username=? and password=?", (username, password)) #ensure database tables are the same
         if cursor.rowcount == 1;
             user = cursor.fetchone()
             return "Login sucessful"
