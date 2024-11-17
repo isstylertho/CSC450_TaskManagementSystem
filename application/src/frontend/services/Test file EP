@@ -1,0 +1,215 @@
+document.addEventListener("DOMContentLoaded", () => {
+    // Check if the user is already logged in by checking local storage for an auth token
+    if (!localStorage.getItem("authToken")) {
+        showLoginForm(); // Show the login form if no token is present
+    } else {
+        fetchTasks(); // Fetch tasks if the user is logged in
+    }
+
+    // Add event listener for adding tasks
+    document.getElementById("addTaskButton").addEventListener("click", addTask);
+});
+
+// Function to render and show the login form
+function showLoginForm() {
+    const appContainer = document.getElementById("appContainer");
+    appContainer.innerHTML = `
+        <div id="loginForm">
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Username" required />
+            <input type="password" id="password" placeholder="Password" required />
+            <button id="loginButton">Login</button>
+        </div>
+    `;
+
+    // Add event listener for login button
+    document.getElementById("loginButton").addEventListener("click", loginUser);
+}
+
+// Function to handle user login
+function loginUser() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    // Validate input fields
+    if (!username || !password) {
+        alert("Please enter both username and password!");
+        return;
+    }
+
+    // Make a POST request to the backend login endpoint
+    fetch("http://localhost:5000/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password }) // Send username and password as JSON
+    })
+        .then(response => {
+            if (response.ok) {
+                return response.json(); // Parse JSON response
+            } else {
+                throw new Error("Invalid login credentials");
+            }
+        })
+        .then(data => {
+            // Store the token in local storage
+            localStorage.setItem("authToken", data.token);
+            alert("Login successful!");
+
+            // Clear the login form and load the task manager
+            document.getElementById("appContainer").innerHTML = '';
+            fetchTasks(); // Fetch tasks after successful login
+        })
+        .catch(error => {
+            // Handle login errors
+            alert("Login failed: " + error.message);
+        });
+}
+
+// Function to fetch and display tasks from the backend
+function fetchTasks() {
+    const token = localStorage.getItem("authToken"); // Get the auth token from local storage
+
+    fetch("http://localhost:5000/tasks", {
+        headers: {
+            "Authorization": `Bearer ${token}` // Include the token in the request headers
+        }
+    })
+        .then(response => {
+            if (response.ok) {
+                return response.json(); // Parse JSON response
+            } else {
+                throw new Error("Failed to fetch tasks");
+            }
+        })
+        .then(tasks => {
+            const taskList = document.getElementById("taskList");
+            taskList.innerHTML = ""; // Clear any existing tasks
+
+            // Iterate through tasks and add them to the UI
+            tasks.forEach(task => {
+                const taskItem = createTaskElement(task);
+                taskList.appendChild(taskItem);
+            });
+        })
+        .catch(error => {
+            console.error("Error fetching tasks:", error);
+
+            // If token is invalid, log the user out and show login form
+            if (error.message === "Failed to fetch tasks") {
+                localStorage.removeItem("authToken"); // Clear invalid token
+                showLoginForm();
+            }
+        });
+}
+
+// Function to create a task element for the task list
+function createTaskElement(task) {
+    const taskItem = document.createElement("li");
+    taskItem.classList.add("task-item");
+    taskItem.textContent = task.title;
+
+    // Mark task as completed if it is
+    if (task.completed) {
+        taskItem.classList.add("completed");
+    }
+
+    // Add click event to toggle task completion
+    taskItem.addEventListener("click", () => {
+        toggleTask(task.id, !task.completed);
+    });
+
+    // Add delete button to task
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete";
+    deleteButton.addEventListener("click", (e) => {
+        e.stopPropagation(); // Prevent parent click event
+        deleteTask(task.id); // Delete the task
+    });
+
+    taskItem.appendChild(deleteButton);
+    return taskItem;
+}
+
+// Function to add a new task
+function addTask() {
+    const token = localStorage.getItem("authToken"); // Get the auth token
+    const taskInput = document.getElementById("taskInput");
+    const title = taskInput.value.trim(); // Get task title
+
+    // Validate task input
+    if (title === "") {
+        alert("Task title cannot be empty!");
+        return;
+    }
+
+    // Send POST request to add the task
+    fetch("http://localhost:5000/tasks", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}` // Include the token
+        },
+        body: JSON.stringify({ title }) // Send task title as JSON
+    })
+        .then(response => {
+            if (response.ok) {
+                fetchTasks(); // Refresh the task list
+                taskInput.value = ""; // Clear the input field
+            } else {
+                console.error("Error adding task");
+            }
+        })
+        .catch(error => console.error("Error:", error));
+}
+
+// Function to toggle task completion
+function toggleTask(id, completed) {
+    const token = localStorage.getItem("authToken"); // Get the auth token
+
+    // Send PATCH request to update task completion status
+    fetch(`http://localhost:5000/tasks/${id}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}` // Include the token
+        },
+        body: JSON.stringify({ completed }) // Send the updated status
+    })
+        .then(response => {
+            if (response.ok) {
+                fetchTasks(); // Refresh the task list
+            } else {
+                console.error("Error updating task");
+            }
+        })
+        .catch(error => console.error("Error:", error));
+}
+
+// Function to delete a task
+function deleteTask(id) {
+    const token = localStorage.getItem("authToken"); // Get the auth token
+
+    // Send DELETE request to remove the task
+    fetch(`http://localhost:5000/tasks/${id}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": `Bearer ${token}` // Include the token
+        }
+    })
+        .then(response => {
+            if (response.ok) {
+                fetchTasks(); // Refresh the task list
+            } else {
+                console.error("Error deleting task");
+            }
+        })
+        .catch(error => console.error("Error:", error));
+}
+
+//Testing Notes
+//API Endpoints: Ensure the backend endpoints (/login, /tasks) match the frontend.
+//SQL Integration: Backend should support authentication and authorization with token-based methods.
+//Token Expiry: Implement token expiry checks on the backend to force re-login if needed.
+
