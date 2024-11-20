@@ -1,1 +1,36 @@
-# this is our docker compose file where we set up the app to run locally using docker
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: task_manager_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - task_manager_network
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: task_manager_web
+    environment:
+      - FLASK_APP=app:create_app
+      - FLASK_ENV=development
+      - SECRET_KEY=mysecretkey
+      - DATABASE_URL=postgresql://user:password@db/task_manager_db
+    ports:
+      - "5000:5000"
+    working_dir: /app
+    depends_on:
+      - db
+    networks:
+      - task_manager_network
+
+networks:
+  task_manager_network:
+    driver: bridge
+
+volumes:
+  db_data:
