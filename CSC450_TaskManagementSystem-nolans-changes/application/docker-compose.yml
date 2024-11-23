@@ -1,0 +1,46 @@
+
+services:
+  postgres:
+    image: postgres:13
+    ports:
+      - "5000:5000"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: task_manager_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - task_manager_network
+  flask-app:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres:13
+    command: python routes.py  #how you run your app
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: task_manager_web
+    environment:
+      - FLASK_APP=app:create_app
+      - FLASK_ENV=development
+      - SECRET_KEY=mysecretkey
+      - DATABASE_URL=postgresql://user:password@db/task_manager_db
+    ports:
+      - "5000:5000"
+    working_dir: /app
+    depends_on:
+      - db
+    networks:
+      - task_manager_network
+
+networks:
+  task_manager_network:
+    driver: bridge
+
+volumes:
+  db_data:
