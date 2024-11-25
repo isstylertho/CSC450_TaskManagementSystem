@@ -1,5 +1,8 @@
 from flask import Flask, flash, jsonify, redirect, request, abort, render_template, url_for
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from app.forms import LoginForm, RegistrationForm, TaskForm
 import os
 from datetime import datetime
 from dotenv import load_dotenv
@@ -27,6 +30,44 @@ db = SQLAlchemy(app)
 
 with app.app_context():
     db.create_all()
+
+# Checks if user is logged in
+@app.route('/')
+def index():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.dashboard')) #direct to overview
+    return render_template('login.html') #directs user to log in if not already
+
+# User authentication routes
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and check_password_hash(user.password, form.password.data):
+            login_user(user)
+            return redirect(url_for('dashboard'))
+        flash('Invalid username or password.')
+    return render_template('login.html', form=form)
+
+# New user registration
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        hashed_password = generate_password_hash(form.password.data, method='sha256')
+        new_user = User(username=form.username.data, password=hashed_password) # need to check if username already exists in db
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Registration successful! Please log in.')
+        return redirect(url_for('login')) #redirects user to login.html once registered
+    return render_template('register.html', form=form)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login')) #redirects user to login.html when user is logged out
 
 #this function handles updating the calendar integration link to the database
 # @app.route('/calendar-view.html/submit', methods=['POST'])
