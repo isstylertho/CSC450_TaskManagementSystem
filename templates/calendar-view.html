@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='user-interface.css') }}">
+</head>
+<body>
+    <section class="left-side-navigation">
+        <header class="left-side-header">
+            <a href="UserProfile"><img src="{{ url_for('static', filename='images/UserProfile.svg') }}" alt="UserProfile" style="width:30px;height:30px;"></a>
+            <a href="Notifications"><img src="{{ url_for('static', filename='images/Notifications.svg') }}" alt="Notifications" style="width:30px;height:30px;"></a>
+            <a href="Settings"><img src="{{ url_for('static', filename='images/Settings.svg') }}" alt="Settings" style="width:30px;height:30px;"></a>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="calendar-view.html"><img src="{{ url_for('static', filename='images/CalendarIcon.svg') }}" alt="UserProfile" style="width:20px;height:20px;">Calendar</a></li>
+                <li><a href="today.html"><img src="{{ url_for('static', filename='images/Today.svg') }}" alt="UserProfile" style="width:20px;height:20px;">Today</a></li>
+                <li><a href="overview.html"><img src="{{ url_for('static', filename='images/Today.svg') }}" alt="UserProfile" style="width:20px;height:20px;">Task Overview</a></li>
+                <li><a href="completed-tasks.html"><img src="{{ url_for('static', filename='images/Completed.svg') }}" alt="UserProfile" style="width:20px;height:20px;">Completed</a></li>
+            </ul>
+            <!-- Logout Button -->
+            <form action="{{ url_for('logout') }}" method="POST">
+                <button type="submit" class="logout-button">Logout</button>
+            </form>
+        </nav>
+    </section>
+    <section class="right-side-main-content">
+        <main>
+            <h1>Calendar View</h1>           
+
+            {% if data %}
+                <!--This takes the return value from calendarView function from app.py to link the calendar-->
+                <iframe src="{{ data }}" style="border: 0" width="90%" height="600px" frameborder="0" scrolling="no"></iframe>
+            {% else %}
+                <!-- if there is no calendarURL entered for user -->
+                <h3>Calendar link invalid or nonexistent - please follow the instructions below.</h3>
+            {% endif %}
+        
+            <h4>To add or update your calendar:</h4>
+            <ol>
+                <li>Sign into your Google Calendar</li>
+                <li>Hover over the desired calendar and click on the three vertical dots (More options). Select settings and sharing.</li>
+                <li>Scroll down to the Access permissions for events section and check the box that says 'Make available to public'.</li>
+                <li>Then scroll down to Integrate calendar section and copy the 'Public URL to this calendar'. Paste your link below.</li>
+            </ol>
+
+            <!--This takes user input to get public URL link-->
+            <form id="myForm" action="/calendar-view.html/submit" method="POST">
+                <label for="userInput">Enter your calendar link:</label>
+                <input type="text" id="userInput" name="user_input" required>
+                <button type="submit">Submit</button>
+            </form> 
+
+        </main>
+    </section>
+</body>
+</html>
