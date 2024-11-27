@@ -145,7 +145,6 @@ def calendarView():
     if not user_id:
         flash("You need to log in first.", "error")
         return redirect(url_for('login'))
-
     # Fetch user from database
     user = User.query.filter_by(UserID=user_id).first()
     if not user:
@@ -166,10 +165,28 @@ def calendarView():
         return render_template('calendar-view.html', data=None)
 
 
-@app.route("/overview.html") #ensures function returns to correct html
+@app.route("/overview.html")  # Ensures function returns to correct html
 @login_required
 def taskOverview():
-    return render_template('overview.html')
+    # Get userID from session
+    user_id = session.get('userID')
+    if not user_id:
+        flash("You need to log in first.", "error")
+        return redirect(url_for('login'))
+
+    # Fetch user from database
+    user = User.query.filter_by(UserID=user_id).first()
+    if not user:
+        flash("User not found. Please log in again.", "error")
+        return redirect(url_for('login'))
+
+    # Fetch the lists and their associated tasks for the logged-in user
+    lists = List.query.filter_by(UserID=user.UserID).all()
+    for list_item in lists:
+        list_item.tasks = Task.query.filter_by(ListID=list_item.ListID).all()
+
+    # Pass the lists and tasks to the template
+    return render_template('overview.html', lists=lists)
 
 @app.route("/completed-tasks.html") #ensures function returns to correct html
 @login_required
@@ -187,6 +204,18 @@ def userinterface():
     return render_template("user-interface.html")
 
 # Models
+
+# describe Users;
+# +-------------+--------------+------+-----+---------+-------+
+# | Field       | Type         | Null | Key | Default | Extra |
+# +-------------+--------------+------+-----+---------+-------+
+# | UserID      | varchar(50)  | NO   | PRI | NULL    |       |
+# | Email       | varchar(100) | NO   | UNI | NULL    |       |
+# | Password    | varchar(255) | NO   |     | NULL    |       |
+# | UserTasks   | varchar(255) | YES  |     | NULL    |       |
+# | calendarURL | varchar(255) | YES  |     | NULL    |       |
+# +-------------+--------------+------+-----+---------+-------+
+
 class User(UserMixin, db.Model): #UserMixin allows check for active user
     __tablename__ = 'Users'
     UserID = db.Column(db.String(50), primary_key=True) #removed username field - this will be the username
@@ -206,32 +235,65 @@ class User(UserMixin, db.Model): #UserMixin allows check for active user
     def get_id(self):
         return self.UserID  # Returns unique identifier of the user
 
+# describe Tasks;
+# +--------------+--------------+------+-----+---------+----------------+
+# | Field        | Type         | Null | Key | Default | Extra          |
+# +--------------+--------------+------+-----+---------+----------------+
+# | TaskID       | int          | NO   | PRI | NULL    | auto_increment |
+# | TaskName     | varchar(100) | NO   |     | NULL    |                |
+# | Description  | text         | YES  |     | NULL    |                |
+# | Priority     | int          | YES  |     | NULL    |                |
+# | CreationDate | date         | NO   |     | NULL    |                |
+# | DueDate      | date         | YES  |     | NULL    |                |
+# | ListID       | int          | YES  | FK  | NULL    |                |
+# +--------------+--------------+------+-----+---------+----------------+
+
 class Task(db.Model):
     __tablename__ = 'Tasks'
-    TaskID = db.Column(db.Integer, primary_key=True)
+    TaskID = db.Column(db.Integer, primary_key=True, autoincrement=True)
     TaskName = db.Column(db.String(100), nullable=False)
     Description = db.Column(db.Text)
     Priority = db.Column(db.Integer)  # 1=High, 2=Medium, 3=Low
     CreationDate = db.Column(db.Date, nullable=False, default=datetime.utcnow)
     DueDate = db.Column(db.Date)
+    ListID = db.Column(db.Integer, db.ForeignKey('Lists.ListID', ondelete='CASCADE'))
 
     def __repr__(self):
         return f"<Task {self.TaskID}, {self.TaskName}, Priority: {self.Priority}>"
 
+# describe Lists;
+# +-----------------+--------------+------+-----+---------+----------------+
+# | Field           | Type         | Null | Key | Default | Extra          |
+# +-----------------+--------------+------+-----+---------+----------------+
+# | UserID          | varchar(50)  | YES  | FK  | NULL    |                |
+# | ListID          | int          | NO   | PRI | NULL    | auto_increment |
+# | ListName        | varchar(100) | NO   |     | NULL    |                |
+# | ListDescription | text         | YES  |     | NULL    |                |
+# +-----------------+--------------+------+-----+---------+----------------+
+
 class List(db.Model):
     __tablename__ = 'Lists'
-    ProjectID = db.Column(db.Integer, primary_key=True)
     UserID = db.Column(db.String(50), db.ForeignKey('Users.UserID', ondelete='CASCADE'))
-    TaskID = db.Column(db.Integer, db.ForeignKey('Tasks.TaskID', ondelete='SET NULL'))
+    ListID = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ListName = db.Column(db.String(100), nullable=False)
     ListDescription = db.Column(db.Text)
 
     def __repr__(self):
-        return f"<List {self.ProjectID}, {self.ListName}>"
+        return f"<List {self.ListID}, {self.ListName}>"
+
+# describe Comments;
+# +-----------+-------------+------+-----+---------+-------+
+# | Field     | Type        | Null | Key | Default | Extra |
+# +-----------+-------------+------+-----+---------+-------+
+# | CommentID | int         | NO   | PRI | NULL    |       |
+# | UserID    | varchar(50) | YES  | FK  | NULL    |       |
+# | TaskID    | int         | YES  | FK  | NULL    |       |
+# | Content   | text        | NO   |     | NULL    |       |
+# +-----------+-------------+------+-----+---------+-------+
 
 class Comment(db.Model):
     __tablename__ = 'Comments'
-    CommentID = db.Column(db.Integer, primary_key=True)
+    CommentID = db.Column(db.Integer, primary_key=True, autoincrement=True)
     UserID = db.Column(db.Integer, db.ForeignKey('Users.UserID', ondelete='CASCADE'))
     TaskID = db.Column(db.Integer, db.ForeignKey('Tasks.TaskID', ondelete='SET NULL'))
     Content = db.Column(db.Text, nullable=False)
@@ -239,9 +301,9 @@ class Comment(db.Model):
     def __repr__(self):
         return f"<Comment {self.CommentID}, User {self.UserID}, Task {self.TaskID}>"
 
-# Ensure database tables are created
-with app.app_context():
-    db.create_all()
+    # Ensure database tables are created
+    with app.app_context():
+        db.create_all()
 
 # Routes
 
@@ -272,6 +334,35 @@ def delete_user(UserID):
     db.session.commit()
     return jsonify({'message': 'User deleted successfully'})
 
+
+@app.route('/lists', methods=['POST'])
+def create_list():
+    # Get userID from session
+    user_id = session.get('userID')
+    if not user_id:
+        flash("You need to log in first.", "error")
+        return redirect(url_for('login'))
+
+    # Fetch user from database
+    user = User.query.filter_by(UserID=user_id).first()
+    if not user:
+        flash("User not found. Please log in again.", "error")
+        return redirect(url_for('login'))
+
+    # Get form data
+    list_name = request.form.get('ListName')
+    description = request.form.get('Description')
+
+    # Save the new list to the database
+    new_list = List(UserID=user.UserID, ListName=list_name, ListDescription=description)
+    db.session.add(new_list)
+    db.session.commit()
+    
+    flash("List created successfully!", "success")
+
+    # Redirect to the overview route after creating the list
+    return redirect(url_for('taskOverview'))
+
 # Tasks Endpoints
 @app.route('/tasks', methods=['GET'])
 def get_tasks():
@@ -284,30 +375,85 @@ def get_tasks():
 
 @app.route('/tasks', methods=['POST'])
 def create_task():
-    data = request.get_json()
-    if not data or 'TaskName' not in data or 'Priority' not in data or 'CreationDate' not in data:
-        abort(400, description="Missing required fields")
+    # Get userID from session
+    user_id = session.get('userID')
+    if not user_id:
+        flash("You need to log in first.", "error")
+        return redirect(url_for('login'))
+
+    # Fetch user from database
+    user = User.query.filter_by(UserID=user_id).first()
+    if not user:
+        flash("User not found. Please log in again.", "error")
+        return render_template('overview.html')
     
+    # Get form data
+    task_name = request.form.get('TaskName')
+    description = request.form.get('Description')
+    priority = request.form.get('Priority')
+    due_date = request.form.get('DueDate')
+    list_id = request.form.get('ListID')  # Get the ListID from the form
+
+    # Validation
+    if not task_name or not priority or not due_date:
+        flash("Missing required fields", "error")
+        return redirect(url_for('taskOverview'))
+
+    # Set CreationDate to current date
+    creation_date = datetime.today().date()
+
+    # Create a new task
     new_task = Task(
-        TaskName=data['TaskName'], 
-        Description=data.get('Description'), 
-        Priority=data['Priority'], 
-        CreationDate=data['CreationDate'], 
-        DueDate=data.get('DueDate')
+        TaskName=task_name,
+        Description=description,
+        Priority=priority,  
+        CreationDate=creation_date,  # Set creation date to current date
+        DueDate=due_date,
+        ListID=list_id  # Associate the task with the correct list
     )
+    
+    # Save to the database
     db.session.add(new_task)
     db.session.commit()
-    return jsonify({'TaskID': new_task.TaskID, 'TaskName': new_task.TaskName}), 201
 
-@app.route('/tasks/<int:TaskID>', methods=['DELETE'])
+    flash("Task successfully created!", "success")
+    return redirect(url_for('taskOverview'))
+
+@app.route('/lists/<int:ListID>', methods=['POST'])
+def delete_list(ListID):
+    if request.form.get('_method') == 'DELETE':  # Check for hidden field '_method'
+        list_to_delete = List.query.get(ListID)
+        
+        if not list_to_delete:
+            abort(404, description="List not found")
+        
+        # Delete tasks associated with this list
+        tasks_to_delete = Task.query.filter_by(ListID=ListID).all()
+        for task in tasks_to_delete:
+            db.session.delete(task)
+        
+        # Now delete the list
+        db.session.delete(list_to_delete)
+        db.session.commit()
+        
+        flash("List and its associated tasks deleted successfully!", "success")
+        return redirect(url_for('taskOverview'))  # Redirect back to the overview page
+    else:
+        abort(400, description="Invalid request method")
+
+@app.route('/tasks/<int:TaskID>', methods=['POST', 'DELETE'])
 def delete_task(TaskID):
-    task = Task.query.get(TaskID)
-    if not task:
-        abort(404, description="Task not found")
-    
-    db.session.delete(task)
-    db.session.commit()
-    return jsonify({'message': 'Task deleted successfully'})
+    if request.method == 'POST' and request.form.get('_method') == 'DELETE':
+        task = Task.query.get(TaskID)
+        if not task:
+            abort(404, description="Task not found")
+
+        db.session.delete(task)
+        db.session.commit()
+        flash("Task deleted successfully!", "success")
+        return redirect(url_for('taskOverview'))  # Redirect to the overview page
+    else:
+        abort(405, description="Method Not Allowed")
 
 # Comments Endpoints
 @app.route('/comments', methods=['GET'])

@@ -29,16 +29,73 @@
     <section class="right-side-main-content">
         <main>
             <h1>Task Overview</h1>
-            <form id="taskForm">
-                <input type="hidden" id="taskId" name="task_id">
-                <label for="title">Title:</label>
-                <input type="text" id="title" name="title" required>
-                <label for="description">Description:</label>
-                <textarea id="description" name="description"></textarea>
-                <label for="due_date">Due Date:</label>
-                <input type="datetime-local" id="due_date" name="due_date" required>
-                <button type="submit">Save Task</button>
-            </form>
+           
+            <h2>Your Lists</h2>
+            <!-- Display lists from database -->
+            <div class="lists-container">
+                {% if lists %}
+                    <ul class="list-group">
+                        {% for list in lists %}
+                            <li class="list-group-item">
+                                <strong>{{ list.ListName }}</strong>
+                                <p>{{ list.ListDescription }}</p>
+                                <!-- Delete the list -->
+                                <form method="POST" action="{{ url_for('delete_list', ListID=list.ListID) }}" style="display:inline;">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <button type="submit">Delete List</button>
+                                </form>
+                            </li>
+                            <!-- Display tasks for each list -->
+                            {% if list.tasks %}
+                                <ul class="task-list">
+                                    {% for task in list.tasks %}
+                                        <li>
+                                            <b>(Priority: {{ task.Priority }}) {{ task.TaskName }}</b>
+                                            <p>{{ task.Description }}</p>
+                                            <small>Due {{ task.DueDate }}</small> 
+                                            <!-- Delete the task -->
+                                            <form method="POST" action="{{ url_for('delete_task', TaskID=task.TaskID) }}" class="delete-form">
+                                                <input type="hidden" name="_method" value="DELETE">
+                                                <button type="submit">Delete</button>
+                                            </form>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>No tasks created for this list.</p>
+                            {% endif %}
+                            <!-- For every list displayed, include a create task form option -->
+                            <form id="taskForm" method="POST" action="{{ url_for('create_task') }}">
+                                <input type="hidden" name="ListID" value="{{ list.ListID }}"> <!-- Specifies which listID the task should be associated with -->
+                                <label for="taskName">Task Name:</label>
+                                <input type="text" id="taskName" name="TaskName" required>
+                                
+                                <label for="description">Description:</label>
+                                <textarea id="description" name="Description"></textarea>
+                                
+                                <label for="priority">Priority:</label>
+                                <input type="number" id="priority" name="Priority">
+                                
+                                <label for="dueDate">Due Date:</label>
+                                <input type="datetime-local" id="dueDate" name="DueDate" required>
+                                
+                                <button type="submit">Save Task</button>
+                            </form>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No lists found. Create one to get started!</p>
+                {% endif %}
+                <form method="POST" action="{{ url_for('create_list') }}">
+                    <label for="ListName">List Name:</label>
+                    <input type="text" id="ListName" name="ListName" required class="form-control" placeholder="Enter list name">
+
+                    <label for="Description">Description:</label>
+                    <textarea id="Description" name="Description" class="form-control" placeholder="Enter list description"></textarea>
+
+                    <button type="submit" class="btn btn-primary">Create List</button>
+                </form>
+            </div>
         </main>
     </section>
 </body>
