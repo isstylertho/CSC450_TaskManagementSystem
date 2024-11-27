@@ -39,13 +39,6 @@ login_manager.login_view = 'login'  # Specify the login route for redirection
 with app.app_context():
     db.create_all()
 
-# Checks if user is logged in
-# @app.route('/')
-# def index():
-#     if current_user.is_authenticated:
-#         return redirect(url_for('main.dashboard')) #direct to overview
-#     return render_template('login.html') #directs user to log in if not already
-
 # Load user function for Flask-Login
 @login_manager.user_loader
 def load_user(user_id):
@@ -62,6 +55,12 @@ def sync_session_with_user():
         print(f"Session userID: {session.get('userID')}")
         print(f"Current user authenticated: {current_user.is_authenticated}")
         print(f"Current user ID: {current_user.get_id() if current_user.is_authenticated else None}")
+
+#this sets up a redirect whenever you click the URL in the terminal after running (http://127.0.0.1)
+@app.route('/')
+def home():
+    # Redirect to the login page
+    return redirect(url_for('taskOverview'))
 
 # User authentication routes
 @app.route('/login', methods=['GET', 'POST'])
@@ -80,7 +79,7 @@ def login():
         if user and check_password_hash(user.Password, password):
             login_user(user)
             session['userID'] = user.UserID  # Store userID in session
-            return redirect(url_for('calendarView'))
+            return redirect(url_for('taskOverview'))
         elif user and not check_password_hash(user.Password, password):
             print("Password entered is incorrect")
             return render_template('login.html', error="Invalid userID or password")
