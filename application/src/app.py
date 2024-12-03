@@ -142,12 +142,12 @@ def calendarView():
     # Get userID from session
     user_id = session.get('userID')
     if not user_id:
-        flash("You need to log in first.", "error")
+        # flash("You need to log in first.", "error")
         return redirect(url_for('login'))
     # Fetch user from database
     user = User.query.filter_by(UserID=user_id).first()
     if not user:
-        flash("User not found. Please log in again.", "error")
+        # flash("User not found. Please log in again.", "error")
         return redirect(url_for('login'))
 
     # Render calendar view
@@ -156,10 +156,10 @@ def calendarView():
         if user.calendarURL and validators.url(user.calendarURL):
             return render_template('calendar-view.html', data=user.calendarURL)
         else:
-            flash("Invalid calendar link. Please update your settings.", "error")
+            # flash("Invalid calendar link. Please update your settings.", "error")
             return render_template('calendar-view.html', data=None)
     else:
-        flash("Your calendar link is not set. Please update it in settings.", "error")
+        # flash("Your calendar link is not set. Please update it in settings.", "error")
         print("Your calendar link is not set. Please update it in settings.")
         return render_template('calendar-view.html', data=None)
 
@@ -170,13 +170,13 @@ def taskOverview():
     # Get userID from session
     user_id = session.get('userID')
     if not user_id:
-        flash("You need to log in first.", "error")
+        # flash("You need to log in first.", "error")
         return redirect(url_for('login'))
 
     # Fetch user from database
     user = User.query.filter_by(UserID=user_id).first()
     if not user:
-        flash("User not found. Please log in again.", "error")
+        # flash("User not found. Please log in again.", "error")
         return redirect(url_for('login'))
 
     # Fetch the lists and their associated tasks for the logged-in user
@@ -339,13 +339,13 @@ def create_list():
     # Get userID from session
     user_id = session.get('userID')
     if not user_id:
-        flash("You need to log in first.", "error")
+        # flash("You need to log in first.", "error")
         return redirect(url_for('login'))
 
     # Fetch user from database
     user = User.query.filter_by(UserID=user_id).first()
     if not user:
-        flash("User not found. Please log in again.", "error")
+        # flash("User not found. Please log in again.", "error")
         return redirect(url_for('login'))
 
     # Get form data
@@ -357,7 +357,7 @@ def create_list():
     db.session.add(new_list)
     db.session.commit()
     
-    flash("List created successfully!", "success")
+    # flash("List created successfully!", "success")
 
     # Redirect to the overview route after creating the list
     return redirect(url_for('taskOverview'))
@@ -377,13 +377,13 @@ def create_task():
     # Get userID from session
     user_id = session.get('userID')
     if not user_id:
-        flash("You need to log in first.", "error")
+        # flash("You need to log in first.", "error")
         return redirect(url_for('login'))
 
     # Fetch user from database
     user = User.query.filter_by(UserID=user_id).first()
     if not user:
-        flash("User not found. Please log in again.", "error")
+        # flash("User not found. Please log in again.", "error")
         return render_template('overview.html')
     
     # Get form data
@@ -395,7 +395,7 @@ def create_task():
 
     # Validation
     if not task_name or not priority or not due_date:
-        flash("Missing required fields", "error")
+        # flash("Missing required fields", "error")
         return redirect(url_for('taskOverview'))
 
     # Set CreationDate to current date
@@ -415,7 +415,7 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
 
-    flash("Task successfully created!", "success")
+    # flash("Task successfully created!", "success")
     return redirect(url_for('taskOverview'))
 
 @app.route('/lists/<int:ListID>', methods=['POST'])
@@ -435,7 +435,7 @@ def delete_list(ListID):
         db.session.delete(list_to_delete)
         db.session.commit()
         
-        flash("List and its associated tasks deleted successfully!", "success")
+        # flash("List and its associated tasks deleted successfully!", "success")
         return redirect(url_for('taskOverview'))  # Redirect back to the overview page
     else:
         abort(400, description="Invalid request method")
@@ -449,7 +449,7 @@ def delete_task(TaskID):
 
         db.session.delete(task)
         db.session.commit()
-        flash("Task deleted successfully!", "success")
+        # flash("Task deleted successfully!", "success")
         return redirect(url_for('taskOverview'))  # Redirect to the overview page
     else:
         abort(405, description="Method Not Allowed")
@@ -491,11 +491,11 @@ def updateCalendarURL():
         user.calendarURL = user_input
         db.session.commit()  # Commit the change to the database
         print("You have successfully updated your calendar link.")
-        flash("Calendar link updated successfully!", "success")
+        # flash("Calendar link updated successfully!", "success")
         return redirect(url_for('calendarView'))
     else:
         print('Calendar URL failed to update')
-        flash("Failed to update the calendar link. Please try again.", "error")
+        # flash("Failed to update the calendar link. Please try again.", "error")
         return redirect(url_for('calendarView'))
 
 
