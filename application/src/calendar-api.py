@@ -44,25 +44,25 @@ def main():
 
     '''Example Task to Add to Calendar -- Format for App Usage'''
     event = {
-        'summary': 'CSC 450 Project Task 3',
-        'location': '',
-        'description': 'Working on that project',
-        'start': {
+        'summary': 'CSC 450 Project Task 3', #pull task name
+        'location': '', #is this required? we dont have anything set up in the UI
+        'description': 'Working on that project', #pull task description (can be null)
+        'start': { #date created
             'dateTime': '2024-11-20T09:00:00-07:00',
             'timeZone': 'America/Los_Angeles',
         },
-        'end': {
+        'end': { #pull task due date
             'dateTime': '2024-11-21T17:00:00-07:00',
             'timeZone': 'America/Los_Angeles',
         },
-        'recurrence': [
+        'recurrence': [ #is this required? we dont have anything set up in the UI
             'RRULE:FREQ=DAILY;COUNT=2'
         ],
-        'attendees': [
+        'attendees': [ # will need current session user's Email
             {'email': 'parrish298@gmail.com'},
             {'email': 'enoellemoore@gmail.com'},
         ],
-        'reminders': {
+        'reminders': { #is this required? we dont have anything set up in the UI
             'useDefault': False,
             'overrides': [
                 {'method': 'email', 'minutes': 24 * 60},
