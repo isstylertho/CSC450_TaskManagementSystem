@@ -31,14 +31,14 @@ body {
     height: 100vh;
 }
 
-.left-side-header {
+/* .left-side-header {
     display: grid;
     grid-template-columns: 160px repeat(2, 40px);
     grid-template-rows: 1fr;
     margin: 10px;
     height: 30px;
     padding-bottom: 10px;
-}
+} */
 
 .right-side-main-content {
     width: 100%;

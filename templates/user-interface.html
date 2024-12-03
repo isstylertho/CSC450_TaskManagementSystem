@@ -8,17 +8,17 @@
 </head>
 <body>
     <section class="left-side-navigation">
-        <header class="left-side-header">
+        <!-- <header class="left-side-header">
             <a href="UserProfile"><img src="{{ url_for('static', filename='images/UserProfile.svg') }}" alt="UserProfile" style="width:30px;height:30px;"></a>
             <a href="Notifications"><img src="{{ url_for('static', filename='images/Notifications.svg') }}" alt="Notifications" style="width:30px;height:30px;"></a>
             <a href="Settings"><img src="{{ url_for('static', filename='images/Settings.svg') }}" alt="Settings" style="width:30px;height:30px;"></a>
-        </header>
+        </header> -->
         <nav>
             <ul>
                 <li><a href="calendar-view.html"><img src="{{ url_for('static', filename='images/CalendarIcon.svg') }}" alt="UserProfile" style="width:20px;height:20px;">Calendar</a></li>
-                <li><a href="today.html"><img src="{{ url_for('static', filename='images/Today.svg') }}" alt="UserProfile" style="width:20px;height:20px;">Today</a></li>
+                <!-- <li><a href="today.html"><img src="{{ url_for('static', filename='images/Today.svg') }}" alt="UserProfile" style="width:20px;height:20px;">Today</a></li> -->
                 <li><a href="overview.html"><img src="{{ url_for('static', filename='images/Today.svg') }}" alt="UserProfile" style="width:20px;height:20px;">Task Overview</a></li>
-                <li><a href="completed-tasks.html"><img src="{{ url_for('static', filename='images/Completed.svg') }}" alt="UserProfile" style="width:20px;height:20px;">Completed</a></li>
+                <!-- <li><a href="completed-tasks.html"><img src="{{ url_for('static', filename='images/Completed.svg') }}" alt="UserProfile" style="width:20px;height:20px;">Completed</a></li> -->
             </ul>
             <!-- Logout Button -->
             <form action="{{ url_for('logout') }}" method="POST">
