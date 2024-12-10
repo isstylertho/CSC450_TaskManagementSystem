@@ -1,4 +1,6 @@
 import datetime
+#import pytz
+from zoneinfo import ZoneInfo
 import os.path
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -13,7 +15,7 @@ pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-
 
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
-def main():
+def main(task_name, description, creation_date, due_date):
   """Shows basic usage of the Google Calendar API.
   """
   creds = None
@@ -28,8 +30,8 @@ def main():
       creds.refresh(Request())
     else:
       flow = InstalledAppFlow.from_client_secrets_file(
-          "credentials.json", SCOPES
-      )
+    'credentials.json', SCOPES)
+
       creds = flow.run_local_server(port=0)
     # Save the credentials for the next run
     with open("token.json", "w") as token:
@@ -42,7 +44,7 @@ def main():
     now = datetime.datetime.utcnow().isoformat() + "Z"  # 'Z' indicates UTC time
     
 
-    '''Example Task to Add to Calendar -- Format for App Usage'''
+    '''Example Task to Add to Calendar -- Format for App Usage
     event = {
         'summary': 'CSC 450 Project Task 3', #pull task name
         'location': '', #is this required? we dont have anything set up in the UI
@@ -69,14 +71,47 @@ def main():
                 {'method': 'popup', 'minutes': 10},
             ],
         },
-    }
+    }'''
 
+    new_event = create_event(task_name, description, now, due_date)
 
+    insert_event(service, new_event)
     # Inserts Event
-    event = service.events().insert(calendarId='primary', body=event).execute()
-    print('Event created: %s' % (event.get('htmlLink')))
+    #event = service.events().insert(calendarId='primary', body=event).execute()
+    
+    #print('Event created: %s' % (event.get('htmlLink')))
+
+
 
 
 
   except HttpError as error:
     print(f"An error occurred: {error}")
+
+def create_event(task_name, description, creation_date, due_date):
+  print('now: ' + creation_date)
+  print('due date: ' + due_date)
+  event = {
+        'summary': task_name, #pull task name
+        'description': description, #pull task description (can be null)
+        'start': { #date created
+            'dateTime': creation_date,
+            'timeZone': 'America/New_York',
+        },
+        'end': { #pull task due date
+            'dateTime': format_due_date(due_date),
+            'timeZone': 'America/New_York',
+        }
+  }
+  return event
+
+def insert_event(service, event):
+  event = service.events().insert(calendarId='primary', body=event).execute()
+  print('Event created: %s' % (event.get('htmlLink')))
+  return
+
+def format_due_date(date):
+  original_date = date
+  parsed_date = datetime.datetime.strptime(original_date, "%Y-%m-%dT%H:%M")
+  formatted_date = parsed_date.strftime("%Y-%m-%dT%H:%M:%S.%f") + "Z"
+  return formatted_date
