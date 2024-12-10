@@ -415,6 +415,9 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
 
+    # Add to Google Calendar
+    calendar_api.main(task_name, description, creation_date, due_date)
+
     # flash("Task successfully created!", "success")
     return redirect(url_for('taskOverview'))
 
